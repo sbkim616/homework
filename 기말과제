@@ -1,0 +1,92 @@
+#1. 선형회기방식
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import yfinance as yf         #gpt: 비트코인 가격데이터를 다운로드하는 코드, 비트코인 가격데이터를 x축에는 날짜, y축에는 가격으로 피팅
+
+# 비트코인 가격 데이터 수집
+btc_data = yf.download('BTC-USD', start='2020-01-01', end='2024-12-01') 
+
+btc_data = btc_data[['Close']] # 종가(마지막 거래가격)만 사용
+btc_data.reset_index(inplace=True)
+btc_data['Day'] = (btc_data['Date'] - btc_data['Date'].min()).dt.days
+
+X = btc_data[['Day']]
+y = btc_data['Close']
+
+# 선형 회귀 모델 적용
+model = LinearRegression()
+model.fit(X, y)
+
+predicted_price = model.predict(X)
+
+plt.figure(figsize=(10, 6))
+plt.plot(btc_data['Date'], btc_data['Close'], label='Actual Price')
+plt.plot(btc_data['Date'], predicted_price, label='Predicted Price', linestyle='--')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Bitcoin Price Prediction using Linear Regression')
+plt.legend()
+plt.show()
+
+# 모델 성능 평가
+from sklearn.metrics import r2_score
+
+r2 = r2_score(y, predicted_price)
+print(f'R^2 Score: {r2}')
+
+
+
+
+
+#다항회귀방식(선형회기에서 다항회기 라이브러리 추가하는 방식으로 만들었음)
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures  # 다항 회귀를 위한 import
+import yfinance as yf
+
+# 비트코인 가격 데이터 수집
+btc_data = yf.download('BTC-USD', start='2020-01-01', end='2024-12-01') 
+
+btc_data = btc_data[['Close']]  # 종가만 사용
+btc_data.reset_index(inplace=True)
+btc_data['Day'] = (btc_data['Date'] - btc_data['Date'].min()).dt.days # 날짜를 일수로 변환
+
+X = btc_data[['Day']]
+y = btc_data['Close']
+
+# 다항 회귀 모델 적용
+poly_features = PolynomialFeatures(degree=5)  # 차수 5으로 설정 (degree 값을 조정하여 모델 복잡도 조절)
+X_poly = poly_features.fit_transform(X)  # X 데이터를 다항 특성으로 변환
+
+model = LinearRegression()
+model.fit(X_poly, y)
+
+predicted_price_poly = model.predict(X_poly)
+
+plt.figure(figsize=(10, 6))
+plt.plot(btc_data['Date'], btc_data['Close'], label='Actual Price')
+plt.plot(btc_data['Date'], predicted_price_poly, label='Predicted Price ()', linestyle='--')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Bitcoin Price Prediction using Polynomial Regression')
+plt.legend()
+plt.show()
+
+# 모델 성능 평가
+from sklearn.metrics import r2_score
+
+r2 = r2_score(y, predicted_price_poly)
+print(f'R^2 Score: {r2}')
+
+
+
+
+
+
+
+
+
